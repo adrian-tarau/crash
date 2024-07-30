@@ -18,11 +18,13 @@
  */
 package org.crsh.auth;
 
-import org.apache.sshd.common.KeyPairProvider;
+import org.apache.sshd.common.keyprovider.KeyPairProvider;
 import org.crsh.plugin.CRaSHPlugin;
 import org.crsh.plugin.PropertyDescriptor;
 
 import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.Arrays;
@@ -75,7 +77,12 @@ public class KeyAuthenticationPlugin extends CRaSHPlugin<KeyAuthenticationPlugin
         keys = new LinkedHashSet<PublicKey>();
         KeyPairProvider provider = new FilePublicKeyProvider(new String[]{authorizedKeyPath});
         for (String type : TYPES) {
-          KeyPair pair = provider.loadKey(type);
+          KeyPair pair = null;
+          try {
+            pair = provider.loadKey(null, type);
+          } catch (Exception e) {
+            log.log(Level.SEVERE, "Failed to load keys for " + type, e);
+          }
           if (pair != null) {
             PublicKey key = pair.getPublic();
             if (key != null) {

@@ -18,9 +18,10 @@
  */
 package org.crsh.ssh.term;
 
-import org.crsh.console.jline.Terminal;
-import org.crsh.console.jline.console.ConsoleReader;
+import jline.Terminal;
+import jline.console.ConsoleReader;
 import org.apache.sshd.server.Environment;
+import org.apache.sshd.server.channel.ChannelSession;
 import org.crsh.console.jline.JLineProcessor;
 import org.crsh.shell.Shell;
 import org.crsh.util.Utils;
@@ -29,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -59,22 +59,8 @@ public class CRaSHCommand extends AbstractCommand implements Runnable, Terminal 
   /** . */
   private JLineProcessor console;
 
-  public void start(Environment env) throws IOException {
-    context = new SSHContext(env);
-    encoding = context.encoding != null ? context.encoding.name() : factory.encoding.name();
-    thread = new Thread(this, "CRaSH");
-
-    //
-    thread.start();
-  }
-
   public SSHContext getContext() {
     return context;
-  }
-
-  public void destroy() {
-    Utils.close(console);
-    thread.interrupt();
   }
 
   public void run() {
@@ -131,6 +117,20 @@ public class CRaSHCommand extends AbstractCommand implements Runnable, Terminal 
   }
 
   @Override
+  public void start(ChannelSession channel, Environment env) throws IOException {
+    context = new SSHContext(env);
+    encoding = context.encoding != null ? context.encoding.name() : factory.encoding.name();
+    thread = new Thread(this, "CRaSH");
+    thread.start();
+  }
+
+  @Override
+  public void destroy(ChannelSession channel) throws Exception {
+    Utils.close(console);
+    thread.interrupt();
+  }
+
+  @Override
   public boolean isSupported() {
     return true;
   }
@@ -148,6 +148,16 @@ public class CRaSHCommand extends AbstractCommand implements Runnable, Terminal 
   @Override
   public boolean isAnsiSupported() {
     return true;
+  }
+
+  @Override
+  public void disableInterruptCharacter() {
+
+  }
+
+  @Override
+  public void enableInterruptCharacter() {
+
   }
 
   @Override

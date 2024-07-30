@@ -18,14 +18,15 @@
  */
 package org.crsh.ssh.term;
 
-import org.apache.sshd.SshServer;
-import org.apache.sshd.common.KeyPairProvider;
 import org.apache.sshd.common.NamedFactory;
-import org.apache.sshd.common.Session;
-import org.apache.sshd.server.Command;
-import org.apache.sshd.server.PasswordAuthenticator;
-import org.apache.sshd.server.PublickeyAuthenticator;
+import org.apache.sshd.common.keyprovider.KeyPairProvider;
+import org.apache.sshd.common.session.Session;
+import org.apache.sshd.core.CoreModuleProperties;
 import org.apache.sshd.server.ServerFactoryManager;
+import org.apache.sshd.server.SshServer;
+import org.apache.sshd.server.auth.password.PasswordAuthenticator;
+import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
+import org.apache.sshd.server.command.Command;
 import org.apache.sshd.server.session.ServerSession;
 import org.crsh.plugin.PluginContext;
 import org.crsh.auth.AuthenticationPlugin;
@@ -33,9 +34,11 @@ import org.crsh.shell.ShellFactory;
 import org.crsh.ssh.term.scp.SCPCommandFactory;
 import org.crsh.ssh.term.subsystem.SubsystemFactoryPlugin;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -134,25 +137,26 @@ public class SSHLifeCycle {
 
       //
       SshServer server = SshServer.setUpDefaultServer();
+      server.setHost("localhost");
       server.setPort(port);
 
       if (this.idleTimeout > 0) {
-        server.getProperties().put(ServerFactoryManager.IDLE_TIMEOUT, String.valueOf(this.idleTimeout));
+        server.getProperties().put(CoreModuleProperties.IDLE_TIMEOUT.getName(), String.valueOf(this.idleTimeout));
       }
       if (this.authTimeout > 0) {
-        server.getProperties().put(ServerFactoryManager.AUTH_TIMEOUT, String.valueOf(this.authTimeout));
+        server.getProperties().put(CoreModuleProperties.AUTH_TIMEOUT.getName(), String.valueOf(this.authTimeout));
       }
 
       server.setShellFactory(new CRaSHCommandFactory(factory, encoding));
       server.setCommandFactory(new SCPCommandFactory(context));
       server.setKeyPairProvider(keyPairProvider);
 
-      //
-      ArrayList<NamedFactory<Command>> namedFactoryList = new ArrayList<NamedFactory<Command>>(0);
+      // TODO not used
+      /*List<NamedFactory<Command>> namedFactoryList = new ArrayList<NamedFactory<Command>>(0);
       for (SubsystemFactoryPlugin plugin : context.getPlugins(SubsystemFactoryPlugin.class)) {
         namedFactoryList.add(plugin.getFactory());
       }
-      server.setSubsystemFactories(namedFactoryList);
+      server.setSubsystemFactories(namedFactoryList);*/
 
       //
       for (AuthenticationPlugin authenticationPlugin : authenticationPlugins) {
@@ -198,8 +202,7 @@ public class SSHLifeCycle {
     if (server != null) {
       try {
         server.stop();
-      }
-      catch (InterruptedException e) {
+      } catch (IOException e) {
         log.log(Level.FINE, "Got an interruption when stopping server", e);
       }
     }

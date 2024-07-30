@@ -18,11 +18,12 @@
  */
 package org.crsh.ssh;
 
-import org.apache.sshd.ClientSession;
-import org.apache.sshd.SshClient;
+import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ChannelShell;
-import org.apache.sshd.common.PtyMode;
-import org.apache.sshd.common.util.SttySupport;
+import org.apache.sshd.client.future.ConnectFuture;
+import org.apache.sshd.client.session.ClientSession;
+import org.apache.sshd.common.channel.PtyMode;
+import org.apache.sshd.common.channel.SttySupport;
 import org.crsh.util.Utils;
 
 import java.io.*;
@@ -88,8 +89,9 @@ public class SSHClient {
     client.start();
 
     //
-    ClientSession session = client.connect("localhost", port).await().getSession();
-    session.authPassword("root", "");
+    ConnectFuture connectFuture = client.connect("root", "localhost", port);
+    connectFuture.await();
+    ClientSession session = connectFuture.getClientSession();
 
     //
     ChannelShell channel = (ChannelShell)session.createShellChannel();

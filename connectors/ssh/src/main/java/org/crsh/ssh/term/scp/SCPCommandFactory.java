@@ -18,11 +18,13 @@
  */
 package org.crsh.ssh.term.scp;
 
-import org.apache.sshd.server.Command;
-import org.apache.sshd.server.CommandFactory;
+import org.apache.sshd.server.channel.ChannelSession;
+import org.apache.sshd.server.command.Command;
+import org.apache.sshd.server.command.CommandFactory;
 import org.crsh.plugin.PluginContext;
 import org.crsh.ssh.term.FailCommand;
 
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,7 +40,8 @@ public class SCPCommandFactory implements CommandFactory {
     this.pluginContext = pluginContext;
   }
 
-  public Command createCommand(String command) {
+  @Override
+  public Command createCommand(ChannelSession channel, String command) throws IOException {
     // Just in case
     command = command.trim();
 

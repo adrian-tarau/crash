@@ -3,17 +3,19 @@ package org.crsh.auth;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 import org.junit.Test;
 
 public class FilePublicKeyProviderTest {
 
   @Test
-  public void test() {
+  public void test() throws GeneralSecurityException, IOException {
     String pubKeyFile = Thread.currentThread().getContextClassLoader().getResource("test_authorized_key.pem").getFile();
     assertTrue(new File(pubKeyFile).exists());
     FilePublicKeyProvider SUT = new FilePublicKeyProvider(new String[]{pubKeyFile});
-    assertTrue(SUT.loadKeys().iterator().hasNext());
+    assertTrue(SUT.loadKeys(null).iterator().hasNext());
   }
 
 }

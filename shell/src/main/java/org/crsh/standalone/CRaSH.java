@@ -19,7 +19,6 @@
 
 package org.crsh.standalone;
 
-import com.sun.tools.attach.VirtualMachine;
 import jline.AnsiWindowsTerminal;
 import jline.Terminal;
 import jline.TerminalFactory;
@@ -281,7 +280,7 @@ public class CRaSH {
         sb.append(port);
         String options = sb.toString();
         Integer pid = pids.get(0);
-        final VirtualMachine vm = VirtualMachine.attach("" + pid);
+        final VirtualMachine vm = VirtualMachine.attach(pid);
         log.log(Level.INFO, "Loading agent with command " + options + " as agent " + agentFile.getCanonicalPath());
         vm.loadAgent(agentFile.getCanonicalPath(), options);
         server.accept();
@@ -294,7 +293,7 @@ public class CRaSH {
       } else {
         for (Integer pid : pids) {
           log.log(Level.INFO, "Attaching to remote process " + pid);
-          VirtualMachine vm = VirtualMachine.attach("" + pid);
+          VirtualMachine vm = VirtualMachine.attach(pid);
           String options = sb.toString();
           log.log(Level.INFO, "Loading agent with command " + options + " as agent " + agentFile.getCanonicalPath());
           vm.loadAgent(agentFile.getCanonicalPath(), options);

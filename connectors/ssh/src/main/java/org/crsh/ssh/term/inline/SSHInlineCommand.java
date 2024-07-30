@@ -1,6 +1,7 @@
 package org.crsh.ssh.term.inline;
 
 import org.apache.sshd.server.Environment;
+import org.apache.sshd.server.channel.ChannelSession;
 import org.crsh.plugin.PluginContext;
 import org.crsh.shell.Shell;
 import org.crsh.shell.ShellFactory;
@@ -45,16 +46,18 @@ public class SSHInlineCommand extends AbstractCommand implements Runnable {
     this.pluginContext = pluginContext;
   }
 
-  public void start(Environment environment) throws IOException {
-    this.env = environment;
+  @Override
+  public void start(ChannelSession channel, Environment env) throws IOException {
+    this.env = env;
     thread = new Thread(this, "CRaSH");
     thread.start();
   }
 
-  public void destroy() {
+  @Override
+  public void destroy(ChannelSession channel) throws Exception {
     thread.interrupt();
   }
-
+  
   public void run() {
 
     // get principal

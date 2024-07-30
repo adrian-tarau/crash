@@ -18,26 +18,26 @@
  */
 package org.crsh.ssh.term;
 
-import org.apache.sshd.common.Factory;
-import org.apache.sshd.server.Command;
+import org.apache.sshd.server.channel.ChannelSession;
+import org.apache.sshd.server.command.Command;
 import org.crsh.shell.ShellFactory;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 
-public class CRaSHCommandFactory implements Factory<Command> {
+public class CRaSHCommandFactory implements org.apache.sshd.server.shell.ShellFactory {
 
-  /** . */
-  final ShellFactory shellFactory;
+    final ShellFactory shellFactory;
 
-  /** . */
-  final Charset encoding;
+    final Charset encoding;
 
-  public CRaSHCommandFactory(ShellFactory shellFactory, Charset encoding) {
-    this.shellFactory = shellFactory;
-    this.encoding = encoding;
-  }
+    public CRaSHCommandFactory(ShellFactory shellFactory, Charset encoding) {
+        this.shellFactory = shellFactory;
+        this.encoding = encoding;
+    }
 
-  public Command create() {
-    return new CRaSHCommand(this);
-  }
+    @Override
+    public Command createShell(ChannelSession channel) throws IOException {
+        return new CRaSHCommand(this);
+    }
 }

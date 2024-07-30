@@ -19,8 +19,8 @@
 
 package org.crsh.ssh;
 
-import org.apache.sshd.common.KeyPairProvider;
-import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
+import org.apache.sshd.common.keyprovider.KeyPairProvider;
+import org.apache.sshd.common.util.security.bouncycastle.BouncyCastleGeneratorHostKeyProvider;
 import org.crsh.auth.AuthenticationPlugin;
 import org.crsh.plugin.CRaSHPlugin;
 import org.crsh.plugin.PropertyDescriptor;
@@ -35,12 +35,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
-
-import org.apache.sshd.common.util.SecurityUtils;
 
 public class SSHPlugin extends CRaSHPlugin<SSHPlugin> {
 
@@ -90,7 +89,6 @@ public class SSHPlugin extends CRaSHPlugin<SSHPlugin> {
   @Override
   public void init() {
 
-    SecurityUtils.setRegisterBouncyCastle(true);
     //
     Integer port = getContext().getProperty(SSH_PORT);
     if (port == null) {
@@ -138,7 +136,7 @@ public class SSHPlugin extends CRaSHPlugin<SSHPlugin> {
       File f = new File(serverKeyPath);
       String keyGen = getContext().getProperty(SSH_SERVER_KEYGEN);
       if (keyGen != null && keyGen.equals("true")) {
-        keyPairProvider = new PEMGeneratorHostKeyProvider(serverKeyPath, "RSA");
+        keyPairProvider = new BouncyCastleGeneratorHostKeyProvider(Paths.get(serverKeyPath));
       } else if (f.exists() && f.isFile()) {
         try {
           serverKeyURL = f.toURI().toURL();

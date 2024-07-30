@@ -2,12 +2,12 @@
   <parent>
     <artifactId>crash.connectors</artifactId>
     <groupId>org.crashub</groupId>
-    <version>1.3.3-SNAPSHOT</version>
+    <version>1.3.2.2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>crash.connectors.ssh</artifactId>
   <packaging>jar</packaging>
-  <version>1.3.3-SNAPSHOT</version>
+  <version>1.3.2.2</version>
 
   <name>CRaSH Connectors - SSH</name>
   <description>The CRaSH SSH connector</description>
@@ -31,15 +31,19 @@
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15on</artifactId>
+      <artifactId>bcprov-jdk18on</artifactId>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpkix-jdk15on</artifactId>
+      <artifactId>bcpkix-jdk18on</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.mina</groupId>
       <artifactId>mina-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jline</groupId>
+      <artifactId>jline</artifactId>
     </dependency>
 
     <!-- For standalone jar -->
@@ -76,6 +80,14 @@
           </execution>
         </executions>
       </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <source>7</source>
+                <target>7</target>
+            </configuration>
+        </plugin>
     </plugins>
   </build>
 
